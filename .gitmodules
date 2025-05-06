@@ -1,0 +1,3 @@
+[submodule "Beggining/Rust-learning"]
+	path = Beggining/Rust-learning
+	url = https://github.com/Pieklonidas/Rust-learning.git
