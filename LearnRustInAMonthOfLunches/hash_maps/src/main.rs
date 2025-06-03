@@ -1,6 +1,13 @@
 
 
 use std::collections::{BTreeSet, BinaryHeap, HashMap, HashSet, VecDeque};
+use std::num::ParseIntError;
+
+fn parse_and_log_str(input: &str) -> Result<i32, ParseIntError> {
+    let parsed_number = input.parse::<i32>()?;
+    println!("Number parsed successfully into {parsed_number}");
+    Ok(parsed_number)
+}
 
 fn main() {
     let mut book_hashmap = HashMap::new();
@@ -122,5 +129,11 @@ fn main() {
     let mut my_vec = VecDeque::from(vec![0; 600_000]);
     for _ in 0..600_000 {
         my_vec.pop_front();
+    }
+
+    let str_vec = vec!["Seven", "8", "9.0", "nice", "6060", "89 elo"];
+    for item in str_vec {
+        let parsed = parse_and_log_str(item);
+        println!("Result: {parsed:?}");
     }
 }
