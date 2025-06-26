@@ -1,0 +1,12 @@
+[package]
+name = "most_popular_crates"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+serde = { version = "1.0.219", features = ["derive"]}
+serde_json = "1.0.140"
+chrono = { version = "0.4.41" }
+rayon = { version = "1.10.0" }
+anyhow = { version = "1.0.98" }
+thiserror = { version = "2.0.12" }
