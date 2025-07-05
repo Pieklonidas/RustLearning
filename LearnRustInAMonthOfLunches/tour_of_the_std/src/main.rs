@@ -1,8 +1,13 @@
-use rand::random;
+#![allow(unused)]
+use rand::{random, rng, Rng};
 use core::num;
 use std::fmt::{self, format};
 use std::i64;
 use std::ops::Add;
+use std::mem;
+use std::time::Duration;
+use std::backtrace::Backtrace;
+
 
 #[derive(Debug)]
 enum Hours {
@@ -83,6 +88,75 @@ impl ChangeForm for i32 {
     }
 }
 
+#[derive(Debug)]
+struct Ring {
+    owner: String,
+    former_owners: Vec<String>,
+}
+
+impl Ring {
+    fn switch_owner_to(&mut self, name: &str) {
+        if let Some(position) = self.former_owners.iter().position(|n| n == name) {
+            mem::swap(&mut self.owner, &mut self.former_owners[position]);
+        } else {
+          println!("Nobody named {name} found in former_owners, sorry!");  
+        }
+    }
+}
+
+struct City {
+    name: String,
+}
+
+impl City {
+    fn change_name(&mut self, name: &str) {
+        let former = mem::replace(&mut self.name, name.to_string());
+        println!("{former} is now called {new}.", new = self.name);
+    }
+}
+
+struct UserState {
+    username: String,
+    connection: Option<Connection>,
+}
+
+struct Connection {
+    url: String,
+    timeout: Duration,
+}
+
+impl UserState {
+    fn is_connected(&self) -> bool {
+        self.connection.is_some()
+    }
+
+    fn connect(&mut self, url: &str) {
+        self.connection = Some(Connection {
+            url: url.to_string(),
+            timeout: Duration::from_secs(3600),
+        });
+    }
+
+    fn disconnect(&mut self) {
+        self.connection.take();
+    }
+}
+
+fn zero_to_three() -> usize {
+    let mut rng = rng();
+    rng.random_range(0..=3)
+}
+
+fn human_readable_rand_num() -> &'static str {
+    match zero_to_three() {
+        0 => "zero",
+        1 => "one",
+        2 => "two",
+        3 => "three",
+        _ => unreachable!(),
+    }
+}
+
 fn main() {
     let my_cities = ["Beirut", "Tel Aviv", "Nicosia"];
     let [city1, _city2, _city3] = my_cities;
@@ -153,4 +227,56 @@ fn main() {
     while let Some(c) = my_string.pop() {
         print!("{c}");
     }
+
+    println!("Size of an i32: {}", mem::size_of::<i32>());
+    let my_array = [8; 50];
+    println!("Size of this array: {}", mem::size_of_val(&my_array));
+
+    let mut one_ring = Ring {
+        owner: "Frodo".to_string(),
+        former_owners: vec!["Gollum".into(), "Sauron".into()],
+    };
+
+    println!("Original state: {one_ring:?}");
+    one_ring.switch_owner_to("Gollum");
+    println!("{one_ring:?}");
+    one_ring.switch_owner_to("Billy");
+    println!("{one_ring:?}");
+
+    let mut capital_city = City {
+        name: "Poznań".to_string(),
+    };
+    capital_city.change_name("Rokietnica");
+
+    let mut number_vec = vec![8, 7, 0, 2, 49, 9999];
+    let mut new_vec = vec![];
+
+    number_vec.iter_mut().for_each(|number| {
+        let taker = mem::take(number);
+        new_vec.push(taker);
+    });
+
+    println!("{:?}\n{:?}", number_vec, new_vec);
+
+    let mut user_state = UserState {
+        username: "Mr. User".to_string(),
+        connection: None,
+    };
+    user_state.connect("some_url");
+    println!("Connected? {}", user_state.is_connected());
+    user_state.disconnect();
+    println!("Connected? {}", user_state.is_connected());
+
+    unsafe {
+        std::env::set_var("RUST_BACKTRACE", "1");   
+    };
+
+    println!("{}", Backtrace::capture());
+
+    let helpful_message = if cfg!(target_os = "windows") {
+        "backslash"
+    } else {
+        "slash"
+    };
+    println!("... then type the directory name followed by a {helpful_message}. Then you...");
 }
