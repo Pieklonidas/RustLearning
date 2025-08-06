@@ -1,0 +1,9 @@
+[package]
+name = "laser_pointer"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+egui = "0.21.0"
+eframe = "0.21.3"
+fastrand = "2.0.0"
